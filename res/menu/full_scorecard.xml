@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.frrahat.cricscorer.FullScorecardActivity" >
+    
+    <item
+        android:id="@+id/actionCopyToClipboard"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="Copy to clipboard"/>
+
+</menu>

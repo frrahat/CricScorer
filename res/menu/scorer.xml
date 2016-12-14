@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.frrahat.cricscorer.ScorerActivity" >
+
+    <item
+        android:id="@+id/action_setCurBowler"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="Set Current Bowler"/>
+    
+    <item
+        android:id="@+id/actionSaveToFile"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="Save"/>
+    
+    <item
+        android:id="@+id/actionLoadFromFile"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="Load"/>
+    
+    <item
+        android:id="@+id/actionSwitchBatsman"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="SwitchBatsman"/>
+
+</menu>

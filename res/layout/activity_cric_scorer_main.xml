@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.frrahat.cricscorer.PalyerNameInputActivity" >
+
+    <EditText
+        android:id="@+id/editTextBat1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editTextBat2"
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:hint="Batsman 1 Name"
+        android:inputType="textEmailAddress" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/editTextBat2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextBat1"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:hint="Batsman 2 Name"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/editTextBow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editTextBat2"
+        android:layout_below="@+id/editTextBat2"
+        android:ems="10"
+        android:hint="Bowler Name"
+        android:inputType="textEmailAddress" />
+
+    <Button
+        android:id="@+id/buttonStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="Start"/>
+
+</RelativeLayout>
