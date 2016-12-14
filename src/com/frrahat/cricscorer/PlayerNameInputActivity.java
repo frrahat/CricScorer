@@ -37,11 +37,20 @@ public class PlayerNameInputActivity extends Activity {
 			}
 		});
 	}
+	
+	@Override
+	public void onBackPressed() {//in case of failure
+		Intent intent=new Intent();
+		intent.putExtra("name", edtPlayerName.getText().toString());
+		setResult(RESULT_OK, intent);
+		
+		super.onBackPressed();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.player_name_input, menu);
+		getMenuInflater().inflate(R.menu.palyer_name_input, menu);
 		return true;
 	}
 
@@ -51,9 +60,9 @@ public class PlayerNameInputActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		/*if (id == R.id.action_settings) {
 			return true;
-		}
+		}*/
 		return super.onOptionsItemSelected(item);
 	}
 }

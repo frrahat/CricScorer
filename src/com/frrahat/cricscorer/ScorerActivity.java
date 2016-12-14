@@ -27,24 +27,21 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ScorerActivity extends Activity {
 	
 	ScoreCard scoreCard;
 	
 	TextView txtViewScore;
-	TextView txtViewBat1;
-	TextView txtViewBat2;
+	TextView txtViewBat;
 	TextView txtViewBowl;
 	TextView txtViewBall;
 	
 	Button buttons[];
-	String buttonStrings[]={"0","1","2","3","4","5","6","wd","nb","b","","","W","W"};
+	String buttonStrings[]={"0","1","2","3","4","-4","6","wd","nb","","","W"};
 	Button btnViewFullScorecard;
 	
 	private final int nextBatsmanReqCode=100;
-	private final int nextBowlerReqCode=300;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +49,10 @@ public class ScorerActivity extends Activity {
 		setContentView(R.layout.activity_scorer);
 		
 		Intent intent = getIntent();
-		scoreCard=new ScoreCard(intent.getStringExtra("bat1"),
-				intent.getStringExtra("bat2"), intent.getStringExtra("bow"));
+		scoreCard=new ScoreCard(intent.getStringExtra("bat"), intent.getStringExtra("bow"));
 		
 		txtViewScore=(TextView) findViewById(R.id.textViewScore);
-		txtViewBat1=(TextView) findViewById(R.id.textViewBat1);
-		txtViewBat2=(TextView) findViewById(R.id.textViewBat2);
+		txtViewBat=(TextView) findViewById(R.id.textViewBat1);
 		txtViewBowl=(TextView) findViewById(R.id.textViewBowl);
 		txtViewBall=(TextView) findViewById(R.id.textViewBall);
 		
@@ -79,32 +74,32 @@ public class ScorerActivity extends Activity {
 			}
 		});
 		
-		buttons=new Button[14];
+		buttons=new Button[12];
 		
 		buttons[0] = (Button) findViewById(R.id.button0);
 		buttons[1] = (Button) findViewById(R.id.button1);
 		buttons[2] = (Button) findViewById(R.id.button2);
 		buttons[3] = (Button) findViewById(R.id.button3);
 		buttons[4] = (Button) findViewById(R.id.button4);
-		buttons[5] = (Button) findViewById(R.id.button5);
+		buttons[5] = (Button) findViewById(R.id.buttonNeg4);
 		buttons[6] = (Button) findViewById(R.id.button6);
 		buttons[7] = (Button) findViewById(R.id.buttonWide);
 		buttons[8] = (Button) findViewById(R.id.buttonNB);
-		buttons[9] = (Button) findViewById(R.id.buttonBy);
-		buttons[10] = (Button) findViewById(R.id.buttonPlus);
-		buttons[11] = (Button) findViewById(R.id.buttonDel);
-		buttons[12] = (Button) findViewById(R.id.buttonWicket);
-		buttons[13] = (Button) findViewById(R.id.buttonRunout);
+		buttons[9] = (Button) findViewById(R.id.buttonPlus);
+		buttons[10] = (Button) findViewById(R.id.buttonDel);
+		buttons[11] = (Button) findViewById(R.id.buttonWicket);
 		
 		for(int i=0;i<7;i++){
 			final int p[]={i,0};
 			buttons[i].setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
+					safeSave();
 					if(scoreCard.isNewOverNext){
 						onNewOver();
 					}
-					BowlEvent bowlEvent=new BowlEvent(EventType.Run, p[0], buttonStrings[p[0]]);
+					String bs=buttonStrings[p[0]];
+					BowlEvent bowlEvent=new BowlEvent(EventType.Run, Integer.parseInt(bs), bs);
 					scoreCard.addBowlEvent(bowlEvent);
 					
 					updateTextViews();
@@ -112,16 +107,17 @@ public class ScorerActivity extends Activity {
 			});
 		}
 		
-		for(int i=7;i<=9;i++){
+		for(int i=7;i<=8;i++){
 			final int q[]={i,0};
 			buttons[i].setOnClickListener(new OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
+					safeSave();
 					if(scoreCard.isNewOverNext){
 						onNewOver();
 					}
-					BowlEvent bowlEvent=new BowlEvent(EventType.Extra, 1, buttonStrings[q[0]]);
+					BowlEvent bowlEvent=new BowlEvent(EventType.Extra, 2, buttonStrings[q[0]]);
 					scoreCard.addBowlEvent(bowlEvent);
 					
 					updateTextViews();
@@ -129,18 +125,33 @@ public class ScorerActivity extends Activity {
 			});
 		}
 		
-		buttons[10].setOnClickListener(new OnClickListener() {
+		buttons[9].setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(getApplicationContext(), "Not implemented",
-						Toast.LENGTH_SHORT).show();
-				/*if(scoreCard.isNewOverNext){
-					onNewOver();
+				safeSave();
+				String parts[]=scoreCard.getCurrentOverstring().split(" ");
+				if(parts.length==0)
+					return;
+				
+				String lastBallString=parts[parts.length-1];
+				if(lastBallString.endsWith("wd") ||
+						lastBallString.endsWith("nb")){
+					onPlusExtraRuns();
+					updateTextViews();
 				}
-				BowlEvent bowlEvent=new BowlEvent(EventType.Plus, 0, buttonStrings[10]);
+			}
+		});
+
+		buttons[10].setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				safeSave();
+				BowlEvent bowlEvent=new BowlEvent(EventType.DeletePrev, 0, buttonStrings[10]);
 				scoreCard.addBowlEvent(bowlEvent);
-				updateTextViews();*/
+				
+				updateTextViews();
 			}
 		});
 
@@ -148,22 +159,7 @@ public class ScorerActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(getApplicationContext(), "Not implemented",
-						Toast.LENGTH_SHORT).show();
-				/*if(scoreCard.isNewOverNext){
-					onNewOver();
-				}
-				BowlEvent bowlEvent=new BowlEvent(EventType.DeletePrev, 0, buttonStrings[11]);
-				scoreCard.addBowlEvent(bowlEvent);
-				
-				updateTextViews();*/
-			}
-		});
-
-		buttons[12].setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
+				safeSave();
 				if(scoreCard.isNewOverNext){
 					onNewOver();
 				}
@@ -173,27 +169,43 @@ public class ScorerActivity extends Activity {
 				startActivityForResult(intent, nextBatsmanReqCode);
 			}
 		});
-
-		buttons[13].setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Toast.makeText(getApplicationContext(), "Not implemented",
-						Toast.LENGTH_SHORT).show();
-				/*if(scoreCard.isNewOverNext){
-					onNewOver();
-				}
-				Intent intent=new Intent(ScorerActivity.this, PlayerNameInputActivity.class);
-				intent.putExtra("hint", "Batsman Name Next to Come");
-				startActivityForResult(intent, nextBatsmanReqCode);
-				//BowlEvent bowlEvent=new BowlEvent(EventType.RunOut, 0, buttonStrings[13]);
-				//scoreCard.addBowlEvent(bowlEvent);
-				
-				updateTextViews();*/
-			}
-		});
 	}
 
+
+
+	private void safeSave() {
+		saveToFile(getApplicationContext(), "backup.scorecard");
+	}
+
+	private void onPlusExtraRuns() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Additional Runs : ");
+
+		// Set up the input
+		final EditText input = new EditText(this);
+		// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+		input.setInputType(InputType.TYPE_CLASS_NUMBER);
+		builder.setView(input);
+
+		// Set up the buttons
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        int extraRuns = Integer.parseInt(input.getText().toString());
+		        scoreCard.plusExtraRuns(extraRuns);
+		        
+		        updateTextViews();
+		    }
+		});
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        dialog.cancel();
+		    }
+		});
+
+		builder.show();
+	}
 
 	private void onNewOver() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -227,8 +239,7 @@ public class ScorerActivity extends Activity {
 
 	private void updateTextViews() {
 		txtViewScore.setText(scoreCard.toScoreString());
-		txtViewBat1.setText(scoreCard.getStrikingBatsman().toString());
-		txtViewBat2.setText(scoreCard.getNonStrikingBatsman().toString());
+		txtViewBat.setText(scoreCard.getCurrentBatsman().toString());
 		txtViewBowl.setText(scoreCard.getCurrentBowler().toString());
 		txtViewBall.setText(scoreCard.getCurrentOverstring());
 	}
@@ -254,11 +265,11 @@ public class ScorerActivity extends Activity {
 			onLoad();
 			return true;
 		}
-		if(id == R.id.actionSwitchBatsman){
+		/*if(id == R.id.actionSwitchBatsman){
 			scoreCard.switcthBatsMan();
 			updateTextViews();
 			return true;
-		}
+		}*/
 		return super.onOptionsItemSelected(item);
 	}
 	
@@ -361,7 +372,7 @@ public class ScorerActivity extends Activity {
 		// TODO Auto-generated method stub		
 		if(requestCode==nextBatsmanReqCode){
 			scoreCard.setNextBatsman(data.getStringExtra("name"));
-			BowlEvent bowlEvent=new BowlEvent(EventType.Wicket, 0, buttonStrings[12]);
+			BowlEvent bowlEvent=new BowlEvent(EventType.Wicket, 0, buttonStrings[11]);
 			scoreCard.addBowlEvent(bowlEvent);	
 			updateTextViews();
 		}

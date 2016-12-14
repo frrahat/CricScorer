@@ -7,6 +7,6 @@
     <string name="title_activity_scorer">Scorer Activity</string>
     <string name="title_activity_palyer_name_input">Names</string>
     <string name="title_activity_full_scorecard">Full Scorecard</string>
-    <string name="title_activity_player_name_input">Player Name Input</string>
+    <string name="title_activity_player_name_input">Batsman Next To Come</string>
 
 </resources>

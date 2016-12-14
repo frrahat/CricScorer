@@ -5,7 +5,7 @@ package com.frrahat.cricscorer;
  * @since Dec 13, 2016
  */
 public class BowlEvent {
-	public static enum EventType{Run, Extra, Wicket, RunOut, DeletePrev, Plus}
+	public static enum EventType{Run, Extra, Wicket, RunOut, DeletePrev}
 	
 	EventType eventType;
 	int runs;
@@ -15,7 +15,6 @@ public class BowlEvent {
 	public BowlEvent(EventType eventType, int runs, String str){
 		this.eventType=eventType;
 		this.runs=runs;
-		this.str=null;
 		this.str=str;
 	}
 }

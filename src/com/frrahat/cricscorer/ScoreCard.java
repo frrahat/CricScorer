@@ -17,9 +17,8 @@ public class ScoreCard implements Serializable{
 	Batsman batsmans[];
 	Bowler bowlers[];
 	
-	int strikingBatsmanNum=0;
-	int nonStrikingBatsmanNum=1;
-	
+	//int lastBallBatsMan=-1;
+	int currentBatsmanNum=0;	
 	int currentBowler=0;
 	
 	String overStrings[];
@@ -28,7 +27,7 @@ public class ScoreCard implements Serializable{
 	boolean isNewOverNext;
 	
 	
-	public ScoreCard(String batsman1name, String batsman2name, String bowlername){
+	public ScoreCard(String batsmanName, String bowlername){
 		this.totalScore=0;
 		this.extras=0;
 		this.wickets=0;
@@ -37,9 +36,7 @@ public class ScoreCard implements Serializable{
 		batsmans=new Batsman[MAX_PLAYER];
 		bowlers=new Bowler[MAX_OVERS];
 		
-		batsmans[0]=new Batsman(batsman1name,0);
-		batsmans[1]=new Batsman(batsman2name, 1);
-		
+		batsmans[0]=new Batsman(batsmanName,0);		
 		bowlers[0]=new Bowler(bowlername, 0);
 		
 		overStrings=new String[MAX_OVERS];
@@ -64,11 +61,7 @@ public class ScoreCard implements Serializable{
 			
 			totalScore+=bowlEvent.runs;
 			
-			if(bowlEvent.runs%2==1){
-				switcthBatsMan();
-			}
-			
-			batsmans[strikingBatsmanNum].addContribution(bowlEvent.runs);
+			batsmans[currentBatsmanNum].addContribution(bowlEvent.runs);
 			bowlers[currentBowler].addContribution(bowlEvent.runs, 1, false);
 		}
 		else if(bowlEvent.eventType==BowlEvent.EventType.Extra){
@@ -92,52 +85,65 @@ public class ScoreCard implements Serializable{
 			}
 			
 			wickets++;
-			batsmans[strikingBatsmanNum].sendToPavillion(true);
+			batsmans[currentBatsmanNum].sendToPavillion(true);
 			bowlers[currentBowler].addContribution(bowlEvent.runs, 1, true);	
-			strikingBatsmanNum=wickets+1;
-		}
-		
-		else if(bowlEvent.eventType==BowlEvent.EventType.RunOut){ 
-			/*ballsInOver++;
-			if(ballsInOver==6){
-				isNewOverNext=true;
-			}
-			wickets++;
-			
-			totalScore+=bowlEvent.runs;
-			//TODO
-			strikingBatsmanNum=wickets+1;*/
-		}
-		else if(bowlEvent.eventType==BowlEvent.EventType.Plus){
-			/*int i=overStrings[currentOver].length()-1;
-			while(i>=0 && overStrings[currentOver].charAt(i)!=' ')
-				i--;
-			if(i<overStrings[currentOver].length()-1){
-				String lastBall=overStrings[currentOver].substring(i+1);
-				overStrings[currentOver]=","+lastBall+",";
-				int j=0;
-				while(j<lastBall.length() && (lastBall.charAt(j)>='0' && lastBall.charAt(j)<='9'))
-					j++;
-				String prevRunString=lastBall.substring(0,j);
-				
-				if(lastBall.length()!=j){
-					int prevRun=0;
-					if(prevRunString.length()!=0){
-						prevRun=Integer.parseInt(prevRunString);
-					}
-					totalScore++;
-					lastBall=Integer.toString(prevRun+1)+lastBall.substring(j);
-					
-					overStrings[currentOver]=overStrings[currentOver].substring(0,i);
-					overStrings[currentOver]+=" "+lastBall;
-				}
-			}*/
-			//TODO
+			currentBatsmanNum=wickets;
 		}
 		else if(bowlEvent.eventType==BowlEvent.EventType.DeletePrev){
-			//TODO
+			String parts[]=overStrings[currentOver].trim().split(" ");
+			if(parts.length==0){
+				return;
+			}
+			
+			String lastBallString=parts[parts.length-1];
+			overStrings[currentOver]="";
+			for(int i=0;i<parts.length-1;i++){
+				overStrings[currentOver]+=" "+parts[i];
+			}
+			
+			if(lastBallString.endsWith("wd") || lastBallString.endsWith("nb")){
+				int len=lastBallString.length();
+				if(len>2){
+					int extraRuns=Integer.parseInt(lastBallString.substring(0,len-2));
+					
+					this.extras-=extraRuns;
+					this.totalScore-=extraRuns;
+					
+					bowlers[currentBowler].runs-=extraRuns;
+				}
+				this.extras-=2;
+				this.totalScore-=2;
+				
+				bowlers[currentBowler].runs-=2;
+			}
+			else if(lastBallString.equals("W")){
+				batsmans[currentBatsmanNum]=null;
+				wickets--;
+				currentBatsmanNum=wickets;
+				batsmans[currentBatsmanNum].isLive=true;
+				batsmans[currentBatsmanNum].balls--;
+				
+				bowlers[currentBowler].balls--;
+			}
+			else{
+				int runs=Integer.parseInt(lastBallString);
+				
+				totalScore-=runs;
+				ballsInOver--;
+				batsmans[currentBatsmanNum].runs-=runs;
+				batsmans[currentBatsmanNum].balls--;
+				
+				if(runs==4){
+					batsmans[currentBatsmanNum].fours--;
+				}else if(runs==6){
+					batsmans[currentBatsmanNum].sixes--;
+				}
+				
+				bowlers[currentBowler].runs-=runs;
+				bowlers[currentBowler].balls--;
+			}
+			return;
 		}
-		
 		
 		overStrings[currentOver]+=" "+bowlEvent.str;
 
@@ -148,8 +154,6 @@ public class ScoreCard implements Serializable{
 		ballsInOver=0;
 		
 		overStrings[currentOver]="";
-		
-		switcthBatsMan();
 		
 		currentBowler++;
 		bowlers[currentBowler]=new Bowler("", currentBowler);
@@ -165,12 +169,8 @@ public class ScoreCard implements Serializable{
 		return Integer.toString(currentOver)+"."+Integer.toString(ballsInOver);
 	}
 	
-	public Batsman getStrikingBatsman(){
-		return batsmans[strikingBatsmanNum];
-	}
-	
-	public Batsman getNonStrikingBatsman() {
-		return batsmans[nonStrikingBatsmanNum];
+	public Batsman getCurrentBatsman(){
+		return batsmans[currentBatsmanNum];
 	}
 	
 	public Bowler getCurrentBowler(){
@@ -186,12 +186,8 @@ public class ScoreCard implements Serializable{
 		return overStrings[currentOver];
 	}
 	
-	public void deleteLastEvent(){
-		//TODO
-	}
-	
 	public void setNextBatsman(String name){
-		batsmans[wickets+2]=new Batsman(name, wickets+2);
+		batsmans[wickets+1]=new Batsman(name, wickets+1);
 	}
 	
 	public void setCurrentBowler(String name){
@@ -202,7 +198,7 @@ public class ScoreCard implements Serializable{
 	public String toString() {
 		String s=toScoreString()+"\n\n";
 		s+="Batsman's Name : R-B-F-S\n";
-		for(int i=0;i<wickets+2;i++){
+		for(int i=0;i<wickets+1;i++){
 			s+=batsmans[i].toString()+"\n";
 		}
 		s+="\nExtras: "+Integer.toString(extras)+"\n";
@@ -217,10 +213,22 @@ public class ScoreCard implements Serializable{
 		return s;
 	}
 	
-	public void switcthBatsMan(){
-		int temp=strikingBatsmanNum;
-		strikingBatsmanNum=nonStrikingBatsmanNum;
-		nonStrikingBatsmanNum=temp;
+	public void plusExtraRuns(int extraRuns){
+		String parts[]=overStrings[currentOver].split(" ");
+		if(parts.length==0){
+			return;
+		}
+		
+		String lastBallString=parts[parts.length-1];
+		overStrings[currentOver]="";
+		for(int i=0;i<parts.length-1;i++){
+			overStrings[currentOver]+=" "+parts[i];
+		}
+		overStrings[currentOver]+=" "+Integer.toString(extraRuns)+lastBallString;
+		
+		totalScore+=extraRuns;
+		extras+=extraRuns;
+		bowlers[currentBatsmanNum].runs+=extraRuns;
 	}
 
 }

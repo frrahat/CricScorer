@@ -23,8 +23,7 @@ import android.widget.TextView;
 public class CricScorerMainActivity extends Activity {
 	
 	Button startButton;
-	EditText batsman1Edt;
-	EditText batsman2Edt;
+	EditText batsmanEdt;
 	EditText bowlerEdt;
 	
 	public static final String storageFolderName="CricScorer";
@@ -40,16 +39,14 @@ public class CricScorerMainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent=new Intent(CricScorerMainActivity.this, ScorerActivity.class);
-				intent.putExtra("bat1", batsman1Edt.getText().toString());
-				intent.putExtra("bat2", batsman2Edt.getText().toString());
+				intent.putExtra("bat", batsmanEdt.getText().toString());
 				intent.putExtra("bow", bowlerEdt.getText().toString());
 				startActivity(intent);
 				
 			}
 		});
 		
-		batsman1Edt=(EditText) findViewById(R.id.editTextBat1);
-		batsman2Edt=(EditText) findViewById(R.id.editTextBat2);
+		batsmanEdt=(EditText) findViewById(R.id.editTextBat1);
 		bowlerEdt=(EditText) findViewById(R.id.editTextBow);
 	}
 

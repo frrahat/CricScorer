@@ -12,31 +12,21 @@
         android:id="@+id/editTextBat1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editTextBat2"
         android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:ems="10"
-        android:hint="Batsman 1 Name"
+        android:hint="Batsman Name"
         android:inputType="textEmailAddress" >
 
         <requestFocus />
     </EditText>
 
     <EditText
-        android:id="@+id/editTextBat2"
+        android:id="@+id/editTextBow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/editTextBat1"
         android:layout_centerHorizontal="true"
-        android:ems="10"
-        android:hint="Batsman 2 Name"
-        android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/editTextBow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editTextBat2"
-        android:layout_below="@+id/editTextBat2"
         android:ems="10"
         android:hint="Bowler Name"
         android:inputType="textEmailAddress" />
@@ -47,6 +37,6 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="Start"/>
+        android:text="Start" />
 
 </RelativeLayout>
