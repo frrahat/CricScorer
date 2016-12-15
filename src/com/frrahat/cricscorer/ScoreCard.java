@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @since Dec 13, 2016
  */
 public class ScoreCard implements Serializable{
-	public static final int MAX_PLAYER=20;
+	public static final int MAX_PLAYER=30;
 	public static final int MAX_OVERS=30;
 	int totalScore;
 	int extras;
@@ -201,7 +201,7 @@ public class ScoreCard implements Serializable{
 		}
 		s+="\n\nOver ball by ball:\n";
 		for(int i=0;i<=currentOver;i++){
-			s+=overStrings[i]+"\n";
+			s+=Integer.toString(i+1)+": "+overStrings[i]+"\n";
 		}
 		return s;
 	}
