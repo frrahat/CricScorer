@@ -172,11 +172,11 @@ public class ScorerActivity extends Activity {
 		});
 	}
 
-	@Override
+	/*@Override
 	public void onBackPressed() {
 		safeSave();
 		super.onBackPressed();
-	}
+	}*/
 	
 	private void safeSave() {
 		saveToFile(getApplicationContext(), "backup.scorecard");

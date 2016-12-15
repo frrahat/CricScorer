@@ -140,7 +140,8 @@ public class FileChooserDialog extends DialogFragment {
 
 		// has SD card
 		if (Environment.getExternalStorageState() != null) {
-			root = Environment.getExternalStorageDirectory();
+			root = new File(Environment.getExternalStorageDirectory(),
+					CricScorerMainActivity.storageFolderName);
 		} else {
 			root = Environment.getDataDirectory();
 		}
