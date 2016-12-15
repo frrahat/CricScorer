@@ -90,7 +90,10 @@ public class ScoreCard implements Serializable{
 			currentBatsmanNum=wickets;
 		}
 		else if(bowlEvent.eventType==BowlEvent.EventType.DeletePrev){
-			String parts[]=overStrings[currentOver].trim().split(" ");
+			String s=overStrings[currentOver].trim();
+			if(s.length()==0)
+				return;
+			String parts[]=s.split(" ");
 			if(parts.length==0){
 				return;
 			}
@@ -109,38 +112,28 @@ public class ScoreCard implements Serializable{
 					this.extras-=extraRuns;
 					this.totalScore-=extraRuns;
 					
-					bowlers[currentBowler].runs-=extraRuns;
+					bowlers[currentBowler].delContribution(extraRuns, 0, false);
 				}
 				this.extras-=2;
 				this.totalScore-=2;
 				
-				bowlers[currentBowler].runs-=2;
+				bowlers[currentBowler].delContribution(2, 0, false);
 			}
 			else if(lastBallString.equals("W")){
 				batsmans[currentBatsmanNum]=null;
 				wickets--;
 				currentBatsmanNum=wickets;
-				batsmans[currentBatsmanNum].isLive=true;
-				batsmans[currentBatsmanNum].balls--;
-				
-				bowlers[currentBowler].balls--;
+				batsmans[currentBatsmanNum].bringBackToLife(true);
+				bowlers[currentBowler].delContribution(0, 1, true);
 			}
 			else{
 				int runs=Integer.parseInt(lastBallString);
 				
 				totalScore-=runs;
 				ballsInOver--;
-				batsmans[currentBatsmanNum].runs-=runs;
-				batsmans[currentBatsmanNum].balls--;
+				batsmans[currentBatsmanNum].delContribution(runs);
 				
-				if(runs==4){
-					batsmans[currentBatsmanNum].fours--;
-				}else if(runs==6){
-					batsmans[currentBatsmanNum].sixes--;
-				}
-				
-				bowlers[currentBowler].runs-=runs;
-				bowlers[currentBowler].balls--;
+				bowlers[currentBowler].delContribution(runs, 1, false);
 			}
 			return;
 		}
@@ -213,7 +206,7 @@ public class ScoreCard implements Serializable{
 		return s;
 	}
 	
-	public void plusExtraRuns(int extraRuns){
+	public void plusAdditionalRuns(int extraRuns){
 		String parts[]=overStrings[currentOver].split(" ");
 		if(parts.length==0){
 			return;
@@ -228,7 +221,7 @@ public class ScoreCard implements Serializable{
 		
 		totalScore+=extraRuns;
 		extras+=extraRuns;
-		bowlers[currentBatsmanNum].runs+=extraRuns;
+		batsmans[currentBatsmanNum].addContribution(extraRuns);
+		bowlers[currentBowler].addContribution(extraRuns, 0, false);
 	}
-
 }

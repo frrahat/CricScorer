@@ -29,10 +29,11 @@ public final class R {
     public static final class id {
         public static final int LinearLayout1=0x7f080008;
         public static final int actionCopyToClipboard=0x7f080021;
-        public static final int actionLoadFromFile=0x7f080024;
-        public static final int actionSaveToFile=0x7f080023;
+        public static final int actionLoadFromFile=0x7f080023;
+        public static final int actionSaveToFile=0x7f080022;
         public static final int action_getSource=0x7f080020;
-        public static final int action_setCurBowler=0x7f080022;
+        public static final int action_setCurBatsman=0x7f080024;
+        public static final int action_setCurBowler=0x7f080025;
         public static final int button0=0x7f08000e;
         public static final int button1=0x7f08000f;
         public static final int button2=0x7f080010;

@@ -8,11 +8,11 @@ import java.io.Serializable;
  */
 public class Bowler implements Serializable{
 	String name;
-	int number;
+	private int number;
 	
-	int runs;
-	int balls;
-	int wickets;
+	private int runs;
+	private int balls;
+	private int wickets;
 	
 	public Bowler(String name, int number){
 		this.name=name;
@@ -29,6 +29,15 @@ public class Bowler implements Serializable{
 		
 		if(takenWicket){
 			this.wickets++;
+		}
+	}
+	
+	public void delContribution(int runs, int balls, boolean takenWicket){
+		this.runs-=runs;
+		this.balls-=balls;
+		
+		if(takenWicket){
+			this.wickets--;
 		}
 	}
 

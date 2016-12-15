@@ -41,7 +41,8 @@ public class ScorerActivity extends Activity {
 	String buttonStrings[]={"0","1","2","3","4","-4","6","wd","nb","","","W"};
 	Button btnViewFullScorecard;
 	
-	private final int nextBatsmanReqCode=100;
+	private final int nextBatsmanNameReqCode=100;
+	private final int curBowlerNameReqCode=300;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -166,13 +167,17 @@ public class ScorerActivity extends Activity {
 				//setNextBatsman
 				Intent intent=new Intent(ScorerActivity.this, PlayerNameInputActivity.class);
 				intent.putExtra("hint", "Batsman Name Next to Come");
-				startActivityForResult(intent, nextBatsmanReqCode);
+				startActivityForResult(intent, nextBatsmanNameReqCode);
 			}
 		});
 	}
 
-
-
+	@Override
+	public void onBackPressed() {
+		safeSave();
+		super.onBackPressed();
+	}
+	
 	private void safeSave() {
 		saveToFile(getApplicationContext(), "backup.scorecard");
 	}
@@ -182,21 +187,29 @@ public class ScorerActivity extends Activity {
 		builder.setTitle("Additional Runs : ");
 
 		// Set up the input
-		final EditText input = new EditText(this);
+		final EditText editTextInput = new EditText(this);
 		// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);
-		builder.setView(input);
+		editTextInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+		builder.setView(editTextInput);
 
 		// Set up the buttons
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
-		        int extraRuns = Integer.parseInt(input.getText().toString());
-		        scoreCard.plusExtraRuns(extraRuns);
-		        
+		    	String input=editTextInput.getText().toString();
+		    	if(input==null || input.length()==0)
+		    		return; 
+		        scoreCard.plusAdditionalRuns(Integer.parseInt(input));
 		        updateTextViews();
 		    }
 		});
+		builder.setNeutralButton("-4",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						scoreCard.plusAdditionalRuns(-4);
+				        updateTextViews();
+					}
+				});
 		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int which) {
@@ -265,11 +278,18 @@ public class ScorerActivity extends Activity {
 			onLoad();
 			return true;
 		}
-		/*if(id == R.id.actionSwitchBatsman){
-			scoreCard.switcthBatsMan();
-			updateTextViews();
+		if(id == R.id.action_setCurBatsman){
+			Intent intent=new Intent(ScorerActivity.this, PlayerNameInputActivity.class);
+			intent.putExtra("hint", "Current Batsman Name");
+			startActivityForResult(intent, nextBatsmanNameReqCode);
 			return true;
-		}*/
+		}
+		if(id == R.id.action_setCurBowler){
+			Intent intent=new Intent(ScorerActivity.this, PlayerNameInputActivity.class);
+			intent.putExtra("hint", "Current Bowler Name");
+			startActivityForResult(intent, curBowlerNameReqCode);
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 	
@@ -369,11 +389,14 @@ public class ScorerActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub		
-		if(requestCode==nextBatsmanReqCode){
+		if(requestCode==nextBatsmanNameReqCode){
 			scoreCard.setNextBatsman(data.getStringExtra("name"));
 			BowlEvent bowlEvent=new BowlEvent(EventType.Wicket, 0, buttonStrings[11]);
 			scoreCard.addBowlEvent(bowlEvent);	
+			updateTextViews();
+		}
+		else if(requestCode==curBowlerNameReqCode){
+			scoreCard.setCurrentBowler(data.getStringExtra("name"));
 			updateTextViews();
 		}
 		super.onActivityResult(requestCode, resultCode, data);
